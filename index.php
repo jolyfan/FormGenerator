@@ -13,13 +13,13 @@ class Form
         return $result . " />";
     }
 
-    public static function input(Array $args = [])
+    public static function input(Array $args = [], $cookie_value = null)
     {
         $res = '<input';
         foreach ($args as $key => $arg) {
             $res .= " " . $key . "='" . $arg . "'";
         }
-        return $res . " />";
+        return $res."/>";
     }
 
     public static function submit(Array $args = [])
@@ -60,8 +60,29 @@ class Form
 
 }
 
-echo Form::open();
+class SmartForm extends Form
+{
+    public static function input(Array $args = [], $cookie_value = null)
+    {
+        $res = '<input';
 
-echo Form::submit();
+        foreach ($args as $key => $arg) {
+            $res .= " " . $key . "='" . $arg . "'";
+            if ($key = "name")
+            {
+                $cookie_value = $_POST[$arg];
 
-echo Form::close();
+                if ($cookie_value != null)
+                {
+                    $res .= " value=".$_POST[$arg];
+                }
+            }
+        }
+        return $res.">";
+    }
+}
+
+echo SmartForm::open(['method' => 'POST']);
+    echo SmartForm::input(['name' => 'input_name']);
+    echo SmartForm::submit(['value' => 'Подтвердить']);
+echo SmartForm::close();
